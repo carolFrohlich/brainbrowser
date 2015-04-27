@@ -630,7 +630,8 @@ $(function() {
     $("#examples").click(function(e) {
       current_request++;
       
-      var name = $(e.target).attr("data-example-name");
+      //var name = $(e.target).attr("data-example-name");
+      var name = getUrl('left');
       var matrixRotX, matrixRotY, matrixRotZ;
       
       if (current_request_name === name) return;
@@ -648,14 +649,24 @@ $(function() {
       var examples = {
         atlas: function() {
           viewer.annotations.setMarkerRadius(1);
-          viewer.loadModelFromURL("models/brain-surface.obj", {
+          viewer.loadModelFromURL(getUrl('left'), {
             format: "mniobj",
             complete: function() {
               $("#vertex-data-wrapper").show();
               $("#pick-value-wrapper").show();
               $("#pick-label-wrapper").show();
-              viewer.loadIntensityDataFromURL("models/atlas-values.txt", {
-                complete: hideLoading
+              viewer.loadIntensityDataFromURL(getVertexUrl('left'), {
+               complete: hideLoading
+              });
+            },
+            cancel: defaultCancelOptions(current_request),
+            parse: { split: true }
+          });
+          viewer.loadModelFromURL(getUrl('right'), {
+            format: "mniobj",
+            complete: function() {
+              viewer.loadIntensityDataFromURL(getVertexUrl('right'), {
+               complete: hideLoading
               });
             },
             cancel: defaultCancelOptions(current_request),
@@ -663,22 +674,22 @@ $(function() {
           });
         },
         dti: function() {
-          viewer.loadModelFromURL("models/dti.obj", {
+          viewer.loadModelFromURL(getUrlLeft(), {
             format: "mniobj",
             render_depth: 999,
             complete: hideLoading,
             cancel: defaultCancelOptions(current_request)
           });
-          viewer.loadModelFromURL("models/left-color-mesh.obj", {
+          viewer.loadModelFromURL(getUrlRight(), {
             format: "mniobj",
             recenter: true,
             cancel: defaultCancelOptions(current_request)
           });
-          viewer.loadModelFromURL("models/right-color-mesh.obj", {
-            format: "mniobj",
-            recenter: true,
-            cancel: defaultCancelOptions(current_request)
-          });
+          // viewer.loadModelFromURL("models/right-color-mesh.obj", {
+          //   format: "mniobj",
+          //   recenter: true,
+          //   cancel: defaultCancelOptions(current_request)
+          // });
         },
         cortical_thickness: function() {
           viewer.annotations.setMarkerRadius(1);
@@ -834,9 +845,10 @@ $(function() {
         }
       };
       
-      if (examples.hasOwnProperty(name)) {
-        examples[name]();
-      }
+      // if (examples.hasOwnProperty(name)) {
+      //   examples[name]();
+      // }
+      examples['atlas']();
       
       return false;
     });
@@ -916,3 +928,38 @@ $(function() {
   });
 });
 
+
+function getUrl (hemisphere) {
+
+  var surface =  $('#surface').val() + '_surface_rsl_';
+  var surface_id = '_81920';
+  var subject = $('#subject').val();
+
+
+  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/civet/surfaces_'+ surface+hemisphere+surface_id+'/'+subject+'_'+surface+hemisphere+surface_id +'.obj';
+}
+
+function getVertexUrl(hemisphere) {
+  var surface =  $('#derivative').val() == 'native_area_40mm' ? 'mid_surface_rsl_' : 'surface_rsl_';
+  var surface_id = '_' + $('#derivative').val();
+  var subject = $('#subject').val();
+
+  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/civet/surfaces_'+ surface+hemisphere+surface_id+'/'+subject+'_'+surface+hemisphere+surface_id +'.txt';
+}
+
+
+function getUrlLeft() {
+  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/civet/surfaces_gray_surface_rsl_left_81920/OHSU_0050147_gray_surface_rsl_left_81920.obj'
+}
+
+function getUrlRight() {
+  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/civet/surfaces_gray_surface_rsl_right_81920/OHSU_0050147_gray_surface_rsl_right_81920.obj'
+}
+
+function getVertexUrlLeft() {
+  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/civet/surfaces_mid_surface_rsl_left_native_area_40mm/OHSU_0050147_mid_surface_rsl_left_native_area_40mm.txt'
+}
+
+function getVertexUrlRight() {
+  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/civet/surfaces_mid_surface_rsl_right_native_area_40mm/OHSU_0050147_mid_surface_rsl_right_native_area_40mm.txt'
+}

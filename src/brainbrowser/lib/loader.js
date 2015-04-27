@@ -61,6 +61,7 @@
       var filename = parts[parts.length-1];
 
       request.open("GET", url);
+      //request.withCredentials = true;
 
       if (result_type === "arraybuffer") {
         request.responseType = "arraybuffer";
