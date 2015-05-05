@@ -627,11 +627,11 @@ $(function() {
     });
 
     // Load demo models.
-    $("#examples").click(function(e) {
+    $("#load_data").click(function(e) {
       current_request++;
       
       //var name = $(e.target).attr("data-example-name");
-      var name = getUrl('left');
+      var name = getUrl('left') + getVertexUrl('left');
       var matrixRotX, matrixRotY, matrixRotZ;
       
       if (current_request_name === name) return;
@@ -754,19 +754,20 @@ $(function() {
           viewer.model.applyMatrix(matrixRotY.multiply(matrixRotX));
         },
         freesurferbin: function() {
-          viewer.annotations.setMarkerRadius(1);
-          viewer.loadModelFromURL("models/freesurfer-binary-surface", {
+          //viewer.annotations.setMarkerRadius(1);
+          //viewer.loadModelFromURL("https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/freesurfer/5.1/OHSU_0050149/surf/lh.area.fsaverage.mgh", {
+            viewer.loadModelFromURL("models/lh.area", {
             format: "freesurferbin",
             complete: function() {
-              $("#vertex-data-wrapper").show();
-              $("#pick-value-wrapper").show();
-              viewer.loadIntensityDataFromURL("models/freesurfer-binary-thickness", {
-                  format: "freesurferbin",
-                  name: "Cortical Thickness",
-                  complete: hideLoading,
-                  cancel: defaultCancelOptions(current_request)
-                }
-              );
+              // $("#vertex-data-wrapper").show();
+              // $("#pick-value-wrapper").show();
+              // viewer.loadIntensityDataFromURL("models/freesurfer-binary-thickness", {
+              //     format: "freesurferbin",
+              //     name: "Cortical Thickness",
+              //     complete: hideLoading,
+              //     cancel: defaultCancelOptions(current_request)
+              //   }
+              // );
             },
             cancel: defaultCancelOptions(current_request)
           });
@@ -849,41 +850,42 @@ $(function() {
       //   examples[name]();
       // }
       examples['atlas']();
+      //examples['freesurferbin']();
       
       return false;
     });
 
-    // If the user changes the format that's being submitted,
-    // display a hint if one has been configured.
-    $(".file-format").change(function() {
-      var div = $(this).closest(".file-select");
-      var format = div.find("option:selected").val();
-      var config_base = this.id === "data-file-format" ? "intensity_data_types" : "model_types";
+    // // If the user changes the format that's being submitted,
+    // // display a hint if one has been configured.
+    // $(".file-format").change(function() {
+    //   var div = $(this).closest(".file-select");
+    //   var format = div.find("option:selected").val();
+    //   var config_base = this.id === "data-file-format" ? "intensity_data_types" : "model_types";
 
-      div.find(".format-hint").html(BrainBrowser.config.get(config_base + "." + format).format_hint || "");
-    });
+    //   div.find(".format-hint").html(BrainBrowser.config.get(config_base + "." + format).format_hint || "");
+    // });
 
-    // Load a new model from a file that the user has
-    // selected.
-    $("#obj_file_submit").click(function() {
-      var format = $(this).closest(".file-select").find("option:selected").val();
-      showLoading();
-      viewer.loadModelFromFile(document.getElementById("objfile"), {
-        format: format,
-        complete: hideLoading
-      });
+    // // Load a new model from a file that the user has
+    // // selected.
+    // $("#obj_file_submit").click(function() {
+    //   var format = $(this).closest(".file-select").find("option:selected").val();
+    //   showLoading();
+    //   viewer.loadModelFromFile(document.getElementById("objfile"), {
+    //     format: format,
+    //     complete: hideLoading
+    //   });
 
-      return false;
-    });
+    //   return false;
+    // });
 
-    $("#data-submit").click(function() {
-      var format = $(this).closest(".file-select").find("option:selected").val();
-      var file = document.getElementById("datafile");
-      viewer.loadIntensityDataFromFile(file, {
-        format: format,
-        blend: true
-      });
-    });
+    // $("#data-submit").click(function() {
+    //   var format = $(this).closest(".file-select").find("option:selected").val();
+    //   var file = document.getElementById("datafile");
+    //   viewer.loadIntensityDataFromFile(file, {
+    //     format: format,
+    //     blend: true
+    //   });
+    // });
 
     // Load a color map select by the user.
     $("#color-map").change(function() {
@@ -895,7 +897,7 @@ $(function() {
     });
 
     // Load first model.
-    $("a.example[data-example-name=atlas]").click();
+    $("#load_data").click();
 
     // If two color maps are loaded to be blended, create
     // slider to control the blending ratios.
