@@ -63,6 +63,8 @@ $(function() {
     });
   });
 
+  $('#freesurfer').hide();
+
   /////////////////////////////////////
   // Start running the Surface Viewer
   /////////////////////////////////////
@@ -629,9 +631,17 @@ $(function() {
     // Load demo models.
     $("#load_data").click(function(e) {
       current_request++;
-      
-      //var name = $(e.target).attr("data-example-name");
-      var name = getUrl('left') + getVertexUrl('left');
+
+      var f_type = $('#file_type').val();
+      var name = '';
+
+
+      if(f_type == 'civet')
+        name = getUrl('left') + getVertexUrl('left');
+      else
+        name = getFreesurferUrl('l');
+
+
       var matrixRotX, matrixRotY, matrixRotZ;
       
       if (current_request_name === name) return;
@@ -647,7 +657,7 @@ $(function() {
       viewer.clearScreen();
 
       var examples = {
-        atlas: function() {
+        civet: function() {
           viewer.annotations.setMarkerRadius(1);
           viewer.loadModelFromURL(getUrl('left'), {
             format: "mniobj",
@@ -753,21 +763,36 @@ $(function() {
 
           viewer.model.applyMatrix(matrixRotY.multiply(matrixRotX));
         },
-        freesurferbin: function() {
+        freesurfer: function() {
           //viewer.annotations.setMarkerRadius(1);
-          //viewer.loadModelFromURL("https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/freesurfer/5.1/OHSU_0050149/surf/lh.area.fsaverage.mgh", {
-            viewer.loadModelFromURL("models/lh.area", {
+          //viewer.loadModelFromURL("https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/freesurfer/5.1/OHSU_0050147/surf/lh.pial", {
+            viewer.loadModelFromURL(getFreesurferUrl('l'), {
             format: "freesurferbin",
             complete: function() {
-              // $("#vertex-data-wrapper").show();
-              // $("#pick-value-wrapper").show();
-              // viewer.loadIntensityDataFromURL("models/freesurfer-binary-thickness", {
-              //     format: "freesurferbin",
-              //     name: "Cortical Thickness",
-              //     complete: hideLoading,
-              //     cancel: defaultCancelOptions(current_request)
-              //   }
-              // );
+              $("#vertex-data-wrapper").show();
+              $("#pick-value-wrapper").show();
+              viewer.loadIntensityDataFromURL(getFreesurferVertexUrl('l'), {
+                  format: "freesurferbin",
+                  name: "Cortical Thickness",
+                  complete: hideLoading,
+                  cancel: defaultCancelOptions(current_request)
+                }
+              );
+            },
+            cancel: defaultCancelOptions(current_request)
+          });
+          viewer.loadModelFromURL(getFreesurferUrl('r'), {
+            format: "freesurferbin",
+            complete: function() {
+              $("#vertex-data-wrapper").show();
+              $("#pick-value-wrapper").show();
+              viewer.loadIntensityDataFromURL(getFreesurferVertexUrl('r'), {
+                  format: "freesurferbin",
+                  name: "Cortical Thickness",
+                  complete: hideLoading,
+                  cancel: defaultCancelOptions(current_request)
+                }
+              );
             },
             cancel: defaultCancelOptions(current_request)
           });
@@ -846,12 +871,15 @@ $(function() {
         }
       };
       
-      // if (examples.hasOwnProperty(name)) {
-      //   examples[name]();
-      // }
-      examples['atlas']();
-      //examples['freesurferbin']();
       
+      var f_type = $('#file_type').val();
+      examples[f_type]();
+
+      //examples['atlas']();
+      //examples['freesurfer']();
+      
+
+
       return false;
     });
 
@@ -950,18 +978,29 @@ function getVertexUrl(hemisphere) {
 }
 
 
-function getUrlLeft() {
-  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/civet/surfaces_gray_surface_rsl_left_81920/OHSU_0050147_gray_surface_rsl_left_81920.obj'
+
+//hemisphere = r or l
+function getFreesurferUrl(hemisphere) {
+  var subject = $('#subject').val();
+  var surface =  $('#freesurfer_surface').val();
+
+  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/freesurfer/5.1/'+ subject +'/surf/'+ hemisphere +'h.' + surface;
 }
 
-function getUrlRight() {
-  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/civet/surfaces_gray_surface_rsl_right_81920/OHSU_0050147_gray_surface_rsl_right_81920.obj'
+function getFreesurferVertexUrl (hemisphere) {
+  var subject = $('#subject').val();
+
+  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/freesurfer/5.1/'+ subject +'/surf/'+ hemisphere +'h.curv';
 }
 
-function getVertexUrlLeft() {
-  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/civet/surfaces_mid_surface_rsl_left_native_area_40mm/OHSU_0050147_mid_surface_rsl_left_native_area_40mm.txt'
-}
 
-function getVertexUrlRight() {
-  return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/civet/surfaces_mid_surface_rsl_right_native_area_40mm/OHSU_0050147_mid_surface_rsl_right_native_area_40mm.txt'
-}
+
+$("#file_type").change(function() {
+  $('#civet').hide();
+  $('#freesurfer').hide();
+
+  var f_type = $("#file_type").val();
+
+  $('#' + f_type).show();
+
+});
