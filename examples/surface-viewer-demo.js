@@ -662,9 +662,6 @@ $(function() {
           viewer.loadModelFromURL(getUrl('left'), {
             format: "mniobj",
             complete: function() {
-              // $("#vertex-data-wrapper").show();
-              // $("#pick-value-wrapper").show();
-              // $("#pick-label-wrapper").show();
               viewer.loadIntensityDataFromURL(getVertexUrl('left'), {
                complete: hideLoading
               });
@@ -764,22 +761,6 @@ $(function() {
           viewer.model.applyMatrix(matrixRotY.multiply(matrixRotX));
         },
         freesurfer: function() {
-          viewer.annotations.setMarkerRadius(1);
-          //lh.inflated
-          //lh.inflated.nofix
-          //lh.orig
-          //lh.orig.nofix
-          //lh.pial
-          //mris_info lh.qsphere.nofix
-          //mris_info lh.smoothwm
-          //mris_info lh.smoothwm.nofix
-          //mris_info lh.sphere
-          //mris_info lh.sphere.reg
-          //mris_info lh.white
-          
-
-
-
           //viewer.loadModelFromURL("https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/freesurfer/5.1/OHSU_0050147/surf/lh.pial", {
             viewer.loadModelFromURL(getFreesurferUrl('l'), {
             format: "freesurferbin",
@@ -795,6 +776,13 @@ $(function() {
             cancel: defaultCancelOptions(current_request),
             parse: { split: true }
           });
+
+          
+
+          var surface = $('#freesurfer_surface').val();
+
+          if(surface != 'sphere' && surface != 'qsphere.nofix' && surface != 'sphere.reg'){
+
           viewer.loadModelFromURL(getFreesurferUrl('r'), {
             format: "freesurferbin",
             complete: function() {
@@ -807,7 +795,7 @@ $(function() {
               // );
             },
             cancel: defaultCancelOptions(current_request)
-          });
+          }); }
         },
         freesurferasc: function() {
           viewer.annotations.setMarkerRadius(1);
