@@ -639,7 +639,7 @@ $(function() {
       if(f_type == 'civet')
         name = getUrl('left') + getVertexUrl('left');
       else
-        name = getFreesurferUrl('l');
+        name = getFreesurferUrl('l') + getFreesurferVertexUrl('l');
 
 
       var matrixRotX, matrixRotY, matrixRotZ;
@@ -662,9 +662,9 @@ $(function() {
           viewer.loadModelFromURL(getUrl('left'), {
             format: "mniobj",
             complete: function() {
-              $("#vertex-data-wrapper").show();
-              $("#pick-value-wrapper").show();
-              $("#pick-label-wrapper").show();
+              // $("#vertex-data-wrapper").show();
+              // $("#pick-value-wrapper").show();
+              // $("#pick-label-wrapper").show();
               viewer.loadIntensityDataFromURL(getVertexUrl('left'), {
                complete: hideLoading
               });
@@ -764,35 +764,47 @@ $(function() {
           viewer.model.applyMatrix(matrixRotY.multiply(matrixRotX));
         },
         freesurfer: function() {
-          //viewer.annotations.setMarkerRadius(1);
+          viewer.annotations.setMarkerRadius(1);
+          //lh.inflated
+          //lh.inflated.nofix
+          //lh.orig
+          //lh.orig.nofix
+          //lh.pial
+          //mris_info lh.qsphere.nofix
+          //mris_info lh.smoothwm
+          //mris_info lh.smoothwm.nofix
+          //mris_info lh.sphere
+          //mris_info lh.sphere.reg
+          //mris_info lh.white
+          
+
+
+
           //viewer.loadModelFromURL("https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/freesurfer/5.1/OHSU_0050147/surf/lh.pial", {
             viewer.loadModelFromURL(getFreesurferUrl('l'), {
             format: "freesurferbin",
             complete: function() {
-              $("#vertex-data-wrapper").show();
-              $("#pick-value-wrapper").show();
               viewer.loadIntensityDataFromURL(getFreesurferVertexUrl('l'), {
                   format: "freesurferbin",
-                  name: "Cortical Thickness",
+                  // name: "Cortical Thickness",
                   complete: hideLoading,
                   cancel: defaultCancelOptions(current_request)
                 }
               );
             },
-            cancel: defaultCancelOptions(current_request)
+            cancel: defaultCancelOptions(current_request),
+            parse: { split: true }
           });
           viewer.loadModelFromURL(getFreesurferUrl('r'), {
             format: "freesurferbin",
             complete: function() {
-              $("#vertex-data-wrapper").show();
-              $("#pick-value-wrapper").show();
-              viewer.loadIntensityDataFromURL(getFreesurferVertexUrl('r'), {
-                  format: "freesurferbin",
-                  name: "Cortical Thickness",
-                  complete: hideLoading,
-                  cancel: defaultCancelOptions(current_request)
-                }
-              );
+              // viewer.loadIntensityDataFromURL(getFreesurferVertexUrl('r'), {
+              //     format: "freesurferbin",
+              //     // name: "Cortical Thickness",
+              //     complete: hideLoading,
+              //     cancel: defaultCancelOptions(current_request)
+              //   }
+              // );
             },
             cancel: defaultCancelOptions(current_request)
           });
@@ -871,49 +883,12 @@ $(function() {
         }
       };
       
-      
       var f_type = $('#file_type').val();
       examples[f_type]();
-
-      //examples['atlas']();
-      //examples['freesurfer']();
-      
-
 
       return false;
     });
 
-    // // If the user changes the format that's being submitted,
-    // // display a hint if one has been configured.
-    // $(".file-format").change(function() {
-    //   var div = $(this).closest(".file-select");
-    //   var format = div.find("option:selected").val();
-    //   var config_base = this.id === "data-file-format" ? "intensity_data_types" : "model_types";
-
-    //   div.find(".format-hint").html(BrainBrowser.config.get(config_base + "." + format).format_hint || "");
-    // });
-
-    // // Load a new model from a file that the user has
-    // // selected.
-    // $("#obj_file_submit").click(function() {
-    //   var format = $(this).closest(".file-select").find("option:selected").val();
-    //   showLoading();
-    //   viewer.loadModelFromFile(document.getElementById("objfile"), {
-    //     format: format,
-    //     complete: hideLoading
-    //   });
-
-    //   return false;
-    // });
-
-    // $("#data-submit").click(function() {
-    //   var format = $(this).closest(".file-select").find("option:selected").val();
-    //   var file = document.getElementById("datafile");
-    //   viewer.loadIntensityDataFromFile(file, {
-    //     format: format,
-    //     blend: true
-    //   });
-    // });
 
     // Load a color map select by the user.
     $("#color-map").change(function() {
@@ -977,8 +952,6 @@ function getVertexUrl(hemisphere) {
   return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/civet/surfaces_'+ surface+hemisphere+surface_id+'/'+subject+'_'+surface+hemisphere+surface_id +'.txt';
 }
 
-
-
 //hemisphere = r or l
 function getFreesurferUrl(hemisphere) {
   var subject = $('#subject').val();
@@ -992,8 +965,6 @@ function getFreesurferVertexUrl (hemisphere) {
 
   return 'https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/freesurfer/5.1/'+ subject +'/surf/'+ hemisphere +'h.curv';
 }
-
-
 
 $("#file_type").change(function() {
   $('#civet').hide();
